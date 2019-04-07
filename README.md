@@ -162,3 +162,76 @@ updateText(e) {
 }
 ```
 Note: The render function is always the bottom function in a class.
+
+### 4. Add a New Nested Component to the React Frontend
+Create a new component file called `Result.js` in the `client/src` folder.
+Add the following to `Result.js`:
+```
+import React, { Component } from 'react';
+
+export default class Result extends Component {
+
+  render() {
+    return (
+    <div className='form-block'>
+      <div className="row">
+        <div className="col">
+          <h2>Text</h2>
+        </div>
+      </div>
+      <div className="row">
+        <div className="col">
+          text_placeholder
+        </div>
+      </div>
+      <div className="row">
+        <div className="col">
+          <h2>Tones</h2>
+        </div>
+      </div>
+      <div className="row">
+        <div className="col">
+          tones_placeholder
+        </div>
+      </div>
+    </div>
+  );
+  }
+}
+```
+You will not see any updates on the frontend yet. <br />
+In `App.js` we need to import `Result.js`:
+```
+import Result from './Result';
+```
+Then add it to the render method of the App component:
+```
+  ...
+    <button className="btn btn-info" onClick={() => this.getTones()}>Retrieve Tones</button>
+  </div>
+  <Result/>
+</div>
+```
+You will now see the update in the frontend.<br />
+In `App.js` we will add a constructor to the top of the class and initialize 2 state variables - text and tones:
+```
+constructor() {
+  super();
+
+  this.state = {
+    text: 'Four score and seven years ago our fathers brought forth on this continent, a new nation, conceived in Liberty, and dedicated to the proposition that all men are created equal. Now we are engaged in a great civil war, testing whether that nation...',
+    tones: []
+  };
+}
+```
+Note: Constructors must always be at the top of the class.
+Now we will send data from through the component hierarchy from `App.js` to `Result.js` in the form of props.
+We update `<Result/>` component in `App.js` to:
+```
+<Result text={this.state.text} />
+```
+In `Result.js` update `text_placeholder` to:
+```
+{this.props.text}
+```
+Notice the initialized text is now being rendered by the Result component and when you type in the text field it is replicated.
