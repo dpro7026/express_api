@@ -1,4 +1,7 @@
 # Express React App
+
+![Image](final_app_functionality.png)
+
 ## Create Express Backend API
 ### 1. Create Basic Express API
 Begin by creating the `express_react_app` root folder and inside this folder create `server.js`.<br />
