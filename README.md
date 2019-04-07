@@ -82,3 +82,83 @@ app.get('/tone', async (req, res) => {
 });
 ```
 Re-start the server and direct to [http://localhost:5001/tone?text=The%20food%20tasted%20very%20distgusting](http://localhost:5001/tone?text=The%20food%20tasted%20very%20distgusting) to see the tones: score, tone_id and tone_name.<br />
+<br />
+
+## Create React Frontend
+### 1. Update Express Backend API to Integrate with React Frontend
+Install `cors` to facilitate Cross-Origin Resource Sharing, allowing the frontend to talk to the backend via HTTP:
+```
+npm install --save cors
+```
+In `server.js` require and use the `cors` middleware by adding the code below the Tone Analyzer configure:
+```
+const cors = require('cors');
+
+app.use(cors());
+```
+Our Express API server is ready complete. Leave the server running and open a second terminal window.
+
+### 2. Create React Frontend
+Create a `client` folder by using the React starter, with command:
+```
+npx create-react-app client
+```
+Change into the client folder directory and add Bootstrap for popular front-end components:
+```
+npm install --save bootstrap
+```
+Include the import for bootstrap in `src/index.js`:
+```
+import 'bootstrap/dist/css/bootstrap.css';
+```
+Add a proxy to the client `package.json` (directly above `"eslintConfig": {`) so that Webpack will proxy our API requests to our Express backend:
+```
+"proxy": "http://localhost:5001/",
+```
+Run the client and see the React starter:
+```
+npm start
+```
+
+### 3. Update Components in the React Frontend
+Start by removing all references to the logo by deleting in `App.js`:
+```
+import logo from './logo.svg';
+
+<img src={logo} className="App-logo" alt="logo" />
+```
+Then delete the `logo.svg` file.<br />
+Now we will refactor the `App.js` class by deleting:
+```
+export default App;
+```
+We can see this is a breaking change to the app as now `Index.js` cannot import `App.js`. So we must update `class App extends Component {` to:
+```
+export default class App extends Component {
+```
+Replace the existing render function in `App.js` with:
+```
+render() {
+ return (
+   <div className="container">
+     <h1>Tone Analyser</h1>
+     <div>
+       <div className="form-group">
+         <textarea className="form-control" id="text-input" placeholder="Enter text here" onChange={e=>this.updateText(e)}></textarea>
+       </div>
+       <button className="btn btn-info" onClick={() => this.getTones()}>Retrieve Tones</button>
+     </div>
+   </div>
+ );
+}
+```
+Try typing into the text field and you will get a breaking error. We need to add a function that will be called when the text is updated.
+Add the following function inside the App class above render method:
+```
+updateText(e) {
+ this.setState({
+   text: e.target.value
+ });
+}
+```
+Note: The render function is always the bottom function in a class.

@@ -9,7 +9,9 @@ const toneAnalyzer = new ToneAnalyzerV3({
   iam_apikey: process.env.IAM_API_KEY,
   url: process.env.IAM_API_URL
 });
+const cors = require('cors');
 
+app.use(cors());
 app.use(express.json());
 
 // create a GET route
