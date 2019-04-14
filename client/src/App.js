@@ -3,6 +3,8 @@ import './App.css';
 import Result from './Result';
 
 export default class App extends Component {
+  baseUri = 'http://localhost:5001';
+
   constructor() {
     super();
   
@@ -12,10 +14,29 @@ export default class App extends Component {
     };
   }
 
+  componentDidMount() {
+    document.body.style.background = '#cafafe';
+    document.getElementById('text-input').value = this.state.text;
+    this.getTones();
+  }
+
   updateText(e) {
     this.setState({
       text: e.target.value
     });
+  }
+
+  async getTones() {
+    try {
+      const response = await fetch(`${this.baseUri}/tone?text=${this.state.text}`);
+      const toneResponse = await response.json();
+  
+      this.setState({
+        tones: toneResponse.document_tone.tones
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   render() {
@@ -28,7 +49,7 @@ export default class App extends Component {
           </div>
           <button className="btn btn-info" onClick={() => this.getTones()}>Retrieve Tones</button>
         </div>
-        <Result text={this.state.text} />
+        <Result text={this.state.text} tones={this.state.tones}/>
       </div>
     );
   }

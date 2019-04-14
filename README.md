@@ -237,4 +237,39 @@ In `Result.js` update `text_placeholder` to:
 ```
 {this.props.text}
 ```
-Notice the initialized text is now being rendered by the Result component and when you type in the text field it is replicated.
+Notice the initialized text is now being rendered by the Result component and when you type in the text field it is replicated.<br />
+
+Finally upon page load, we want to initialize the text-field to equal the value of text stored in the state. Understanding the life-cycle of React, we need to use the `componentDidMount()` to ensure rendering happens after the constructor has been set. We will also update the background color to a light blue and we will call `getTones()` so that when the page initially loads we will do a RESTful call to the backend to get the values from the Watson Tone Analyzer API:
+```
+componentDidMount() {
+  document.body.style.background = '#cafafe';
+  document.getElementById('text-input').value = this.state.text;
+  this.getTones();
+}
+```
+
+### 5. React Frontend Calls the RESTful Backend
+Upon page load or when we click the `Retrieve Tones` button, we realize that nothing happens. The `componentDidMount()` and the button with an `onClick()` action both call `getTones()` and we haven't yet defined this function in our code yet. Let's do that now in `App.js` below `updateText()`:
+```
+async getTones() {
+  try {
+    const response = await fetch(`${this.baseUri}/tone?text=${this.state.text}`);
+    const toneResponse = await response.json();
+
+    this.setState({
+      tones: toneResponse.document_tone.tones
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
+```
+This is an Async function, a new feature added as part of ES8. We will add the following line to define the baseURI at the top of the component above the constructor:
+```
+baseUri = 'http://localhost:5001';
+```
+If we inspect the page and use the `React Developer Tool Add-On` we can see that when we have text in the text-field such as the example `Gettysburg Address` text, then upon clicking the button we do indeed do a RESTful call and store values into an array called `tones` in the state of the App component.<br />
+To render the tone information to the page we will need to pass it via props to the nested component, `Result.js` by updating the component in the `App.js` render method to:
+```
+<Result text={this.state.text} tones={this.state.tones}/>
+```
