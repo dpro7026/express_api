@@ -1,6 +1,16 @@
 import React, { Component } from 'react';
+import Record from './Record';
 
 export default class Result extends Component {
+  renderResults() {
+    if (this.props.tones.length === 0) {
+      return 'No tones detected';
+    }
+    return this.props.tones.map(classification => {
+      const key = classification.tone_id;
+      return <Record classification={classification} key={key}/>;
+    });
+  }
 
   render() {
     return (
@@ -22,7 +32,7 @@ export default class Result extends Component {
       </div>
       <div className="row">
         <div className="col">
-          tones_placeholder
+          {this.renderResults()}
         </div>
       </div>
     </div>

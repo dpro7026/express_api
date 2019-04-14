@@ -35,7 +35,9 @@ export default class App extends Component {
         tones: toneResponse.document_tone.tones
       });
     } catch (error) {
-      console.log(error);
+      this.setState({
+        tones: []
+      });
     }
   }
 

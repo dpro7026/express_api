@@ -260,7 +260,9 @@ async getTones() {
       tones: toneResponse.document_tone.tones
     });
   } catch (error) {
-    console.log(error);
+    this.setState({
+      tones: []
+    });
   }
 }
 ```
@@ -273,3 +275,85 @@ To render the tone information to the page we will need to pass it via props to 
 ```
 <Result text={this.state.text} tones={this.state.tones}/>
 ```
+
+### 6. Render A Map Of Components
+In `Result.js`, we will update the `tone_placeholder` to the following function call:
+```
+{this.renderResults()}
+```
+When we make the RESTful API call to the backend, there could be zero to many tones returned. This means we will need to render zero to many tone records. If the there is at least one tone we will create a list item showing the tone name and score. Also notice that each component generated from an array requires a unique key so that React can trace if the component has been updated and the individual component needs to be updated rather than updating all components of this type:
+```
+renderResults() {
+  if (this.props.tones.length === 0) {
+    return 'No tones detected';
+  }
+  return this.props.tones.map(classification => {
+    const key = classification.tone_id;
+    return <li key={key}>Tone Name: {classification.tone_name}, Score: {classification.score}</li>;
+  });
+}
+```
+
+### 7. Another Nested Component
+Create a new file `Record.js` that will be the component responsible for rendering each tone found in the text. In this file set the state using the props passed in from the parent component and round the score to 2 decimal places:
+```
+import React, { Component } from 'react';
+
+export default class Record extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      tone: props.classification.tone_name,
+      score: (props.classification.score * 100).toFixed(2)
+    };
+  }
+
+  render() {
+    return (
+      <div className="row">
+        <div className="col">
+          {this.state.tone}: {this.state.score}   
+        </div>
+      </div>
+    );
+  }
+}
+```
+Update `Result.js` to import the Record component by adding the following line below the import React line of code:
+```
+import Record from './Record';
+```
+Then we will update the `renderResults()` in `Results.js` to use the Record component. Replace:
+```
+return <li key={key}>Tone Name: {classification.tone_name}, Score: {classification.score}</li>;
+```
+with
+```
+return <Record classification={classification} key={key}/>;
+```
+
+### 8. Add Bootstrap Progress Bars 
+In `Record.js` we want to add a progress bar for each tone based on the score. Replace:
+```
+{this.state.tone}: {this.state.score}  
+```
+with
+```
+{this.state.tone}
+<div className="progress">
+  <div className="progress-bar" style={{width: `${this.state.score}%`, backgroundColor: this.getColor(this.state.score)}}>{this.state.score}</div>
+</div> 
+```
+Notice above we call `getColor()` to set the background colour of the progress bar. We will add the function `getColor()` below our constructor in `Record.js`:
+```
+getColor(score) {
+  if (score > 75) {
+    return 'green';
+  } else if(score > 50){
+    return 'orange';
+  } else {
+    return 'red';
+  }
+}
+```
+We have created a simple React frontend application that uses a RESTful GET request to communicate with our Express backend application that communicates with IBM's Watson Tone Analyzer service to give a dynamic and responsive single-page web application.
